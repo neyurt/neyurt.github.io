@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "remote-vllm": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Remote vLLM",
+      "options": {
+        "baseURL": "http://10.0.0.92:8000/v1"
+      },
+      "models": {
+        "Qwen/Qwen3-4B-AWQ": {
+          "name": "Qwen3 4B AWQ",
+          "limit": {
+            "context": 16384,
+            "output": 4096
+          }
+        }
+      }
+    }
+  }
+}
