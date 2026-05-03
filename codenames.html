@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codenames</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            padding: 20px;
+            background: #f5f0e8;
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body {
+            padding: 20px;
+            background: #f5f0e8 url('paper-texture.png') repeat;
+            background-size: 400px 400px;
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: 'TOP SECRET';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 120px;
+            color: rgba(139, 0, 0, 0.08);
+            font-family: 'Special Elite', 'Courier New', monospace;
+            pointer-events: none;
+            z-index: 0;
+            letter-spacing: 20px;
+            white-space: nowrap;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #ebe5d9;
+            border: 2px solid #c4b89c;
+            position: relative;
+        }
+
+        .header::before {
+            content: 'CLASSIFIED';
+            position: absolute;
+            top: 15px;
+            right: 30px;
+            font-size: 13px;
+            color: rgba(139, 0, 0, 0.6);
+            font-family: 'Special Elite', 'Courier New', monospace;
+            letter-spacing: 3px;
+            transform: rotate(8deg);
+            border: 2px solid rgba(139, 0, 0, 0.5);
+            padding: 4px 10px;
+            border-radius: 3px;
+            background: rgba(139, 0, 0, 0.08);
+        }
+
+        .stamp-graphic {
+            position: absolute;
+            top: 10px;
+            left: 30px;
+            width: 100px;
+            height: 100px;
+            background: url('top-secret-stamp.webp') no-repeat center;
+            background-size: contain;
+            opacity: 0.15;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+
+        .header::after {
+            content: '▲ TOP SECRET ▲';
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            font-size: 9px;
+            color: rgba(139, 0, 0, 0.35);
+            font-family: 'Special Elite', 'Courier New', monospace;
+            letter-spacing: 2px;
+            transform: rotate(-5deg);
+        }
+
+        h1 {
+            font-family: 'Special Elite', 'Courier New', monospace;
+            font-size: 42px;
+            color: #2c2c2c;
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .turn-indicator {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+
+        .turn-blue { color: #1a3a6e; }
+        .turn-red { color: #8b0000; }
+
+        .scores {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin: 20px 0;
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .score-blue { color: #1a3a6e; }
+        .score-red { color: #8b0000; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #e8e2d4;
+            border: 3px solid #a09372;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .card {
+            aspect-ratio: 4/3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            background: #faf6ef;
+            border: 2px solid #a09372;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .card:hover:not(.revealed) {
+            background: #f0ebe0;
+            border-color: #8b7d5a;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .card.revealed {
+            cursor: default;
+            pointer-events: none;
+            color: white;
+            border-width: 3px;
+        }
+
+        .card.blue {
+            background: #1a3a6e;
+            border-color: #0d1f3c;
+        }
+
+        .card.red {
+            background: #8b0000;
+            border-color: #5c0000;
+        }
+
+        .card.assassin {
+            background: #1a1a1a;
+            border-color: #000;
+        }
+
+        .card.neutral {
+            background: #b8b0a0;
+            color: #4a453f;
+            border-color: #8c8578;
+        }
+
+        #endTurnBtn {
+            padding: 10px 40px;
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            background: #2c2c2c;
+            color: #f5f0e8;
+            border: 2px solid #1a1a1a;
+            cursor: pointer;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        #endTurnBtn:hover {
+            background: #1a1a1a;
+        }
+
+        .master-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .master-link a {
+            font-family: 'Special Elite', 'Courier New', monospace;
+            font-size: 18px;
+            color: #2c2c2c;
+            text-decoration: none;
+            padding: 12px 30px;
+            border: 3px solid #2c2c2c;
+            display: inline-block;
+            letter-spacing: 4px;
+            background: #ebe5d9;
+        }
+
+        .master-link a:hover {
+            background: #2c2c2c;
+            color: #f5f0e8;
+        }
+
+        .game-over {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.92);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: #f5f0e8;
+            font-family: 'Special Elite', 'Courier New', monospace;
+            font-size: 32px;
+            font-weight: bold;
+            z-index: 100;
+            letter-spacing: 3px;
+            text-align: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .game-over::before {
+            content: 'TOP SECRET';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 120px;
+            color: rgba(180, 0, 0, 0.12);
+            letter-spacing: 30px;
+            pointer-events: none;
+            font-weight: bold;
+        }
+
+        .game-over .stamp {
+            font-size: 60px;
+            color: rgba(139, 0, 0, 0.6);
+            border: 6px solid rgba(139, 0, 0, 0.5);
+            padding: 20px 40px;
+            transform: rotate(-10deg);
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-over" id="gameOver"></div>
+    <div class="container">
+        <div class="stamp-graphic"></div>
+        <div class="game-area">
+            <div class="header">
+                <h1>Codenames</h1>
+                <div class="turn-indicator">Current Turn: <span id="turnText" class="turn-blue">Blue Team</span></div>
+                <div class="scores">
+                    <div class="score-blue">Blue: <span id="blueScore">0</span>/9</div>
+                    <div class="score-red">Red: <span id="redScore">0</span>/8</div>
+                </div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <button id="endTurnBtn" style="padding: 10px 30px; font-size: 16px; font-weight: bold; background: #333; color: white; border: none; border-radius: 8px; cursor: pointer;">End Turn</button>
+                </div>
+            </div>
+            <div class="grid" id="gameGrid"></div>
+        </div>
+        <div class="master-link" style="text-align: center; margin-top: 20px;">
+            <a href="codemasters.html" target="_blank" style="font-size: 18px; font-weight: bold; color: #333; text-decoration: none; padding: 10px 25px; border: 2px solid #333; border-radius: 8px; display: inline-block; letter-spacing: 3px;">CODE MASTERS</a>
+        </div>
+    </div>
+
+    <script>
+        const wordBank = [
+            "AFRICA", "AGENT", "AIR", "ALIEN", "ALPS", "AMAZON", "AMBULANCE", "AMERICA", "ANGEL", "ANTARCTICA",
+            "APPLE", "ARM", "ATLANTIS", "AUSTRALIA", "AZTEC", "BACK", "BALL", "BAND", "BANK", "BAR",
+            "BARK", "BAT", "BATTERY", "BEACH", "BEAR", "BEAT", "BED", "BEIJING", "BELL", "BELT",
+            "BERLIN", "BERMUDA", "BERRY", "BILL", "BLOCK", "BOARD", "BOLT", "BOMB", "BOND", "BOOM",
+            "BOOT", "BOTTLE", "BOW", "BOX", "BRIDGE", "BRUSH", "BUCK", "BUFFALO", "BUG", "BUGLE",
+            "BUTTON", "CALF", "CANADA", "CAP", "CAPITAL", "CAR", "CARD", "CARROT", "CASINO", "CAST",
+            "CAT", "CELL", "CENTAUR", "CENTER", "CHAIR", "CHANGE", "CHARGE", "CHECK", "CHEST", "CHICK",
+            "CHINA", "CHOCOLATE", "CHURCH", "CIRCLE", "CLIFF", "CLOAK", "CLUB", "CODE", "COLD", "COMIC",
+            "COMPOUND", "CONCERT", "CONDUCTOR", "CONTRACT", "COOK", "COPPER", "COTTON", "COURT", "COVER", "CRANE",
+            "CRASH", "CRICKET", "CROSS", "CROWN", "CYCLE", "CZECH", "DANCE", "DATE", "DAY", "DEATH",
+            "DECK", "DEGREE", "DIAMOND", "DICE", "DINOSAUR", "DISEASE", "DOCTOR", "DOG", "DRAFT", "DRAGON",
+            "DRESS", "DRILL", "DROP", "DUCK", "DWARF", "EAGLE", "EGYPT", "EMBASSY", "ENGINE", "ENGLAND",
+            "EUROPE", "EYE", "FACE", "FAIR", "FALL", "FAN", "FENCE", "FIELD", "FIGHTER", "FIGURE",
+            "FILE", "FILM", "FIRE", "FISH", "FLUTE", "FLY", "FOOT", "FORCE", "FOREST", "FORK",
+            "FRANCE", "GAME", "GAS", "GENIUS", "GERMANY", "GHOST", "GIANT", "GLASS", "GLOVE", "GOLD",
+            "GRACE", "GRASS", "GREECE", "GREEN", "GROUND", "HAM", "HAND", "HAWK", "HEAD", "HEART",
+            "HELICOPTER", "HIMALAYAS", "HOLE", "HOLLYWOOD", "HONEY", "HOOD", "HOOK", "HORN", "HORSE", "HORSESHOE",
+            "HOSPITAL", "HOTEL", "ICE", "ICE CREAM", "INDIA", "IRON", "IVORY", "JACK", "JAM", "JET",
+            "JUPITER", "KANGAROO", "KETCHUP", "KEY", "KID", "KING", "KIWI", "KNIFE", "KNIGHT", "LAB",
+            "LAP", "LASER", "LAWYER", "LEAD", "LEMON", "LEPRECHAUN", "LIFE", "LIGHT", "LIMOUSINE", "LINE",
+            "LINK", "LION", "LITTER", "LOCH NESS", "LOCK", "LOG", "LONDON", "LUCK", "MAIL", "MAMMOTH",
+            "MAPLE", "MARBLE", "MARCH", "MASS", "MATCH", "MERCURY", "MEXICO", "MICROSCOPE", "MILLIONAIRE", "MINE",
+            "MINT", "MISSILE", "MODEL", "MOLE", "MOON", "MOSCOW", "MOUNT", "MOUSE", "MOUTH", "MUG",
+            "NAIL", "NEEDLE", "NET", "NEW YORK", "NIGHT", "NINJA", "NOTE", "NOVEL", "NURSE", "NUT",
+            "OCTOPUS", "OIL", "OLIVE", "OLYMPUS", "OPERA", "ORANGE", "ORGAN", "PALM", "PAN", "PANTS",
+            "PAPER", "PARACHUTE", "PARK", "PART", "PASS", "PASTE", "PENGUIN", "PHOENIX", "PIANO", "PIE",
+            "PILOT", "PIN", "PIPE", "PIRATE", "PISTOL", "PIT", "PITCH", "PLANE", "PLASTIC", "PLATE",
+            "PLATYPUS", "PLAY", "PLOT", "POINT", "POISON", "POLE", "POLICE", "POOL", "PORT", "POST",
+            "POUND", "PRESS", "PRINCESS", "PUMPKIN", "PUPIL", "PYRAMID", "QUEEN", "RABBIT", "RACKET", "RAY",
+            "REVOLUTION", "RING", "ROBIN", "ROBOT", "ROCK", "ROME", "ROOT", "ROSE", "ROULETTE", "ROUND",
+            "ROW", "RULER", "SATELLITE", "SATURN", "SCALE", "SCHOOL", "SCIENTIST", "SCORPION", "SCREEN", "SCUBA DIVER",
+            "SEAL", "SERVER", "SHADOW", "SHAKESPEARE", "SHARK", "SHIP", "SHOE", "SHOP", "SHOT", "SINK",
+            "SKYSCRAPER", "SLIP", "SLUG", "SMUGGLER", "SNOW", "SNOWMAN", "SOCK", "SOLDIER", "SOUL", "SOUND",
+            "SPACE", "SPELL", "SPIDER", "SPIKE", "SPINE", "SPOT", "SPRING", "SPY", "SQUARE", "STADIUM",
+            "STAFF", "STAR", "STATE", "STICK", "STOCK", "STRAW", "STREAM", "STRIKE", "STRING", "SUB",
+            "SUIT", "SUPERHERO", "SWING", "SWITCH", "TABLE", "TABLET", "TAG", "TAIL", "TAP", "TEACHER",
+            "TELESCOPE", "TEMPLE", "THEATER", "THIEF", "THUMB", "TICK", "TIE", "TIME", "TOKYO", "TOOTH",
+            "TORCH", "TOWER", "TRACK", "TRAIN", "TRIANGLE", "TRIP", "TRUNK", "TUBE", "TURKEY", "UNDERTAKER",
+            "UNICORN", "VACUUM", "VAN", "VET", "WAKE", "WALL", "WAR", "WASHER", "WASHINGTON", "WATCH",
+            "WATER", "WAVE", "WEB", "WELL", "WHALE", "WHIP", "WIND", "WITCH", "WORM", "YARD"
+        ];
+
+        let words = [], roles = [], revealed = [], currentTurn = 'blue', scores = { blue: 0, red: 0 }, gameActive = true;
+
+        function syncToStorage() {
+            localStorage.setItem('codenames_words', JSON.stringify(words));
+            localStorage.setItem('codenames_roles', JSON.stringify(roles));
+            localStorage.setItem('codenames_revealed', JSON.stringify(revealed));
+        }
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function initGame() {
+            const shuffledWords = shuffleArray([...wordBank]);
+            words = shuffledWords.slice(0, 25);
+            const roleList = [...Array(9).fill('blue'), ...Array(8).fill('red'), 'assassin', ...Array(7).fill('neutral')];
+            roles = shuffleArray(roleList);
+            revealed = Array(25).fill(false);
+            currentTurn = 'blue';
+            scores = { blue: 0, red: 0 };
+            gameActive = true;
+            document.getElementById('gameOver').style.display = 'none';
+            syncToStorage();
+            updateUI();
+        }
+
+        function updateUI() {
+            const turnText = document.getElementById('turnText');
+            turnText.className = currentTurn === 'blue' ? 'turn-blue' : 'turn-red';
+            turnText.textContent = currentTurn === 'blue' ? 'Blue Team' : 'Red Team';
+            document.getElementById('blueScore').textContent = scores.blue;
+            document.getElementById('redScore').textContent = scores.red;
+            renderGameGrid();
+        }
+
+        function renderGameGrid() {
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = '';
+            words.forEach((word, i) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                if (revealed[i]) {
+                    card.classList.add('revealed', roles[i]);
+                    card.textContent = word;
+                } else {
+                    card.textContent = word;
+                    card.addEventListener('click', () => handleClick(i));
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        function handleClick(index) {
+            if (!gameActive || revealed[index]) return;
+            revealed[index] = true;
+            const role = roles[index];
+            
+            if (role === currentTurn) {
+                scores[currentTurn]++;
+                if (currentTurn === 'blue' && scores.blue === 9) endGame('Blue Team Wins!', '#1a3a6e');
+                if (currentTurn === 'red' && scores.red === 8) endGame('Red Team Wins!', '#8b0000');
+            } else if (role === 'assassin') {
+                const winner = currentTurn === 'blue' ? { team: 'Red Team', color: '#8b0000' } : { team: 'Blue Team', color: '#1a3a6e' };
+                endGame(`${winner.team} Wins!<br><span style="font-size:24px;margin-top:10px;">Assassin: ${words[index]}</span>`, winner.color);
+            } else {
+                if (role === 'blue' || role === 'red') {
+                    scores[role]++;
+                    if (role === 'blue' && scores.blue === 9) endGame('Blue Team Wins!');
+                    if (role === 'red' && scores.red === 8) endGame('Red Team Wins!');
+                }
+                if (gameActive) {
+                    currentTurn = currentTurn === 'blue' ? 'red' : 'blue';
+                }
+            }
+            syncToStorage();
+            updateUI();
+        }
+
+        function endGame(message, winnerColor) {
+            gameActive = false;
+            const el = document.getElementById('gameOver');
+            const stampColor = winnerColor || 'rgba(139, 0, 0, 0.6)';
+            el.innerHTML = `<div class="stamp" style="color: ${stampColor}; border-color: ${stampColor};">${message}</div>`;
+            el.style.display = 'flex';
+        }
+
+        function endTurn() {
+            if (!gameActive) return;
+            currentTurn = currentTurn === 'blue' ? 'red' : 'blue';
+            updateUI();
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('endTurnBtn').addEventListener('click', endTurn);
+            initGame();
+        });
+    </script>
+</body>
+</html>
