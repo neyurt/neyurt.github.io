@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Codenames - Cold War Edition</title>
     <script>
-        // Decode the SPA redirect from 404.html: turns /?/abc back into /abc in the URL bar.
+        // 1) Decode the SPA redirect from 404.html (turns /?/abc back into /abc).
+        // 2) If the path looks like a room name, jump straight to the game.
         (function(l) {
             if (l.search[1] === '/') {
                 var decoded = l.search.slice(1).split('&').map(function(s) {
                     return s.replace(/~and~/g, '&');
                 }).join('?');
                 window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
+            }
+            var path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+            if (path && path !== 'index.html') {
+                window.location.replace('codenames.html?room=' + encodeURIComponent(path));
             }
         })(window.location);
     </script>
@@ -117,6 +122,46 @@
             gap: clamp(12px, 2vw, 15px);
         }
 
+        .seed-box {
+            background: #ebe5d9;
+            border: 3px solid #a09372;
+            padding: clamp(14px, 2.5vw, 20px) clamp(18px, 3vw, 25px);
+            margin-bottom: clamp(12px, 2vw, 15px);
+        }
+
+        .seed-label {
+            display: block;
+            font-family: 'Special Elite', 'Courier New', monospace;
+            font-size: clamp(13px, 1.8vw, 15px);
+            letter-spacing: clamp(2px, 0.4vw, 3px);
+            text-transform: uppercase;
+            color: #2c2c2c;
+            margin-bottom: 8px;
+        }
+
+        .seed-input {
+            width: 100%;
+            padding: clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 14px);
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            font-size: clamp(13px, 1.8vw, 15px);
+            background: #faf6ef;
+            border: 2px solid #a09372;
+            color: #2c2c2c;
+            letter-spacing: 1px;
+            outline: none;
+        }
+
+        .seed-input:focus { border-color: #2c2c2c; }
+
+        .seed-hint {
+            display: block;
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            font-size: clamp(10px, 1.3vw, 11px);
+            color: #6b655a;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
         .menu-item {
             display: block;
             padding: clamp(16px, 2.5vw, 20px) clamp(20px, 3vw, 30px);
@@ -205,17 +250,42 @@
             <div class="subtitle">Cold War Edition</div>
         </div>
 
+        <div class="seed-box">
+            <label class="seed-label" for="seedInput">Mission Code (Room Name)</label>
+            <input type="text" id="seedInput" class="seed-input" placeholder="e.g. abc123" autocomplete="off" spellcheck="false">
+            <span class="seed-hint">Same code = same synced game. Leave blank for a random room.</span>
+        </div>
+
         <div class="menu">
-            <a href="codenames.html" class="menu-item">
+            <a href="codenames.html" id="startLink" class="menu-item">
                 Start Game
                 <span class="desc">Play Codenames - Field Operatives Only</span>
             </a>
 
-            <a href="codemasters.html" target="_blank" class="menu-item">
+            <a href="codemasters.html" id="masterLink" target="_blank" class="menu-item">
                 Code Masters
                 <span class="desc">Spymaster View - Open After Mission Briefing</span>
             </a>
         </div>
+
+        <script>
+            (function() {
+                const input = document.getElementById('seedInput');
+                const startLink = document.getElementById('startLink');
+                const masterLink = document.getElementById('masterLink');
+                function clean(s) {
+                    return (s || '').toLowerCase().trim().replace(/[^a-z0-9_-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 64);
+                }
+                function update() {
+                    const room = clean(input.value);
+                    const q = room ? '?room=' + encodeURIComponent(room) : '';
+                    startLink.href = 'codenames.html' + q;
+                    masterLink.href = 'codemasters.html' + q;
+                }
+                input.addEventListener('input', update);
+                update();
+            })();
+        </script>
 
         <div class="footer">
             CLASSIFIED // EYES ONLY // DO NOT DISTRIBUTE
