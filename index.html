@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codenames - Cold War Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            padding: 20px;
+            background: #f5f0e8 url('paper-texture.png') repeat;
+            background-size: 400px 400px;
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body::before {
+            content: 'TOP SECRET';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 120px;
+            color: rgba(139, 0, 0, 0.06);
+            font-family: 'Special Elite', 'Courier New', monospace;
+            pointer-events: none;
+            z-index: 0;
+            letter-spacing: 20px;
+            white-space: nowrap;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 30px;
+            background: #ebe5d9;
+            border: 3px solid #a09372;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .header::before {
+            content: 'CLASSIFIED';
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 13px;
+            color: rgba(139, 0, 0, 0.5);
+            font-family: 'Special Elite', 'Courier New', monospace;
+            letter-spacing: 3px;
+            transform: rotate(8deg);
+            border: 2px solid rgba(139, 0, 0, 0.4);
+            padding: 4px 10px;
+            border-radius: 3px;
+            background: rgba(139, 0, 0, 0.05);
+        }
+
+        .header::after {
+            content: '▲ TOP SECRET ▲';
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            font-size: 9px;
+            color: rgba(139, 0, 0, 0.35);
+            font-family: 'Special Elite', 'Courier New', monospace;
+            letter-spacing: 2px;
+            transform: rotate(-5deg);
+        }
+
+        h1 {
+            font-family: 'Special Elite', 'Courier New', monospace;
+            font-size: 48px;
+            color: #2c2c2c;
+            letter-spacing: 10px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #6b655a;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 20px 30px;
+            background: #ebe5d9;
+            border: 3px solid #a09372;
+            text-decoration: none;
+            color: #2c2c2c;
+            font-family: 'Special Elite', 'Courier New', monospace;
+            font-size: 20px;
+            letter-spacing: 4px;
+            text-align: center;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background: #2c2c2c;
+            color: #f5f0e8;
+            border-color: #2c2c2c;
+        }
+
+        .menu-item .desc {
+            display: block;
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            color: #6b655a;
+            text-transform: none;
+        }
+
+        .menu-item:hover .desc {
+            color: #a09372;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            font-size: 11px;
+            color: #8c8578;
+            letter-spacing: 1px;
+            border-top: 2px solid #a09372;
+        }
+
+        .stamp-graphic {
+            position: fixed;
+            top: 20px;
+            left: 30px;
+            width: 120px;
+            height: 120px;
+            background: url('top-secret-stamp.webp') no-repeat center;
+            background-size: contain;
+            opacity: 0.12;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+
+        .stamp-graphic-2 {
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            width: 100px;
+            height: 100px;
+            background: url('top-secret-stamp.webp') no-repeat center;
+            background-size: contain;
+            opacity: 0.1;
+            transform: rotate(10deg);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="stamp-graphic"></div>
+    <div class="stamp-graphic-2"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Codenames</h1>
+            <div class="subtitle">Cold War Edition</div>
+        </div>
+
+        <div class="menu">
+            <a href="codenames.html" class="menu-item">
+                Start Game
+                <span class="desc">Play Codenames - Field Operatives Only</span>
+            </a>
+
+            <a href="codemasters.html" target="_blank" class="menu-item">
+                Code Masters
+                <span class="desc">Spymaster View - Open After Mission Briefing</span>
+            </a>
+        </div>
+
+        <div class="footer">
+            CLASSIFIED // EYES ONLY // DO NOT DISTRIBUTE
+        </div>
+    </div>
+</body>
+</html>
