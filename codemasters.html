@@ -114,6 +114,24 @@
         .card.assassin { background: #1a1a1a; border-color: #000; }
         .card.neutral { background: #8c8578; border-color: #6b655a; color: #e8e2d4; }
 
+        .card.revealed {
+            opacity: 0.45;
+            outline: 3px solid #2c2c2c;
+            outline-offset: -3px;
+        }
+
+        .room-header {
+            text-align: center;
+            margin-bottom: clamp(10px, 2vw, 15px);
+            font-family: 'Special Elite', 'Courier New', monospace;
+            font-size: clamp(11px, 1.6vw, 13px);
+            color: #6b655a;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .room-header strong { color: #2c2c2c; letter-spacing: 1px; }
+
         .legend {
             margin-top: clamp(15px, 3vw, 25px);
             display: flex;
@@ -161,6 +179,7 @@
 <body>
     <div class="container">
         <h1>CODE MASTERS</h1>
+        <div class="room-header">Room: <strong id="roomName">—</strong></div>
         <div class="grid" id="masterGrid"></div>
         <div class="legend">
             <div class="legend-item"><div class="legend-box blue"></div> Blue (9)</div>
@@ -170,36 +189,53 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+    <script src="game.js"></script>
     <script>
+        let room = '', words = [], roles = [], revealed = Array(25).fill(false), generation = 0;
+
+        function rebuildBoard() {
+            const board = buildBoard(room + '#' + generation);
+            words = board.words;
+            roles = board.roles;
+        }
+
         function renderMasterGrid() {
             const grid = document.getElementById('masterGrid');
             grid.innerHTML = '';
-
-            const words = JSON.parse(localStorage.getItem('codenames_words') || '[]');
-            const roles = JSON.parse(localStorage.getItem('codenames_roles') || '[]');
-
-            if (words.length === 0) {
-                grid.innerHTML = '<div class="message">No active game.<br>Start a game on the Codenames page first.</div>';
+            if (!words || words.length === 0) {
+                grid.innerHTML = '<div class="message">No room specified.<br>Open a game from the home page.</div>';
                 return;
             }
-
             words.forEach((word, i) => {
                 const card = document.createElement('div');
                 card.className = `card ${roles[i]}`;
+                if (revealed[i]) card.classList.add('revealed');
                 card.textContent = word;
                 grid.appendChild(card);
             });
         }
 
-        window.addEventListener('storage', function(e) {
-            if (e.key && e.key.startsWith('codenames_')) {
+        window.addEventListener('DOMContentLoaded', function() {
+            room = getRoomFromQuery();
+            if (!room) {
                 renderMasterGrid();
+                return;
             }
+            document.getElementById('roomName').textContent = room;
+            rebuildBoard();
+            renderMasterGrid();
+
+            roomRef(room).child('state').on('value', function(snap) {
+                const s = snap.val();
+                if (!s) return;
+                generation = typeof s.generation === 'number' ? s.generation : 0;
+                revealed = Array.isArray(s.revealed) && s.revealed.length === 25 ? s.revealed.slice() : Array(25).fill(false);
+                rebuildBoard();
+                renderMasterGrid();
+            });
         });
-
-        window.addEventListener('DOMContentLoaded', renderMasterGrid);
-
-        setInterval(renderMasterGrid, 1000);
     </script>
 </body>
 </html>

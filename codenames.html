@@ -112,6 +112,34 @@
         .turn-blue { color: #1a3a6e; }
         .turn-red { color: #8b0000; }
 
+        .room-name {
+            font-family: 'Special Elite', 'Courier New', monospace;
+            font-size: clamp(11px, 1.6vw, 13px);
+            color: #6b655a;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .room-name strong { color: #2c2c2c; letter-spacing: 1px; }
+
+        #newGameBtn {
+            margin-left: 10px;
+            padding: clamp(8px, 1.2vw, 10px) clamp(16px, 2.5vw, 24px);
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            font-size: clamp(12px, 1.7vw, 13px);
+            font-weight: bold;
+            background: #ebe5d9;
+            color: #2c2c2c;
+            border: 2px solid #a09372;
+            cursor: pointer;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            touch-action: manipulation;
+        }
+
+        #newGameBtn:hover { background: #a09372; color: #f5f0e8; }
+
         .scores {
             display: flex;
             justify-content: center;
@@ -279,6 +307,7 @@
         <div class="game-area">
             <div class="header">
                 <h1>Codenames</h1>
+                <div class="room-name">Room: <strong id="roomName">—</strong></div>
                 <div class="turn-indicator">Current Turn: <span id="turnText" class="turn-blue">Blue Team</span></div>
                 <div class="scores">
                     <div class="score-blue">Blue: <span id="blueScore">0</span>/9</div>
@@ -286,6 +315,7 @@
                 </div>
                 <div class="end-turn-wrap">
                     <button id="endTurnBtn">End Turn</button>
+                    <button id="newGameBtn">New Game</button>
                 </div>
             </div>
             <div class="grid" id="gameGrid"></div>
@@ -295,78 +325,64 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+    <script src="game.js"></script>
     <script>
-        const wordBank = [
-            "AFRICA", "AGENT", "AIR", "ALIEN", "ALPS", "AMAZON", "AMBULANCE", "AMERICA", "ANGEL", "ANTARCTICA",
-            "APPLE", "ARM", "ATLANTIS", "AUSTRALIA", "AZTEC", "BACK", "BALL", "BAND", "BANK", "BAR",
-            "BARK", "BAT", "BATTERY", "BEACH", "BEAR", "BEAT", "BED", "BEIJING", "BELL", "BELT",
-            "BERLIN", "BERMUDA", "BERRY", "BILL", "BLOCK", "BOARD", "BOLT", "BOMB", "BOND", "BOOM",
-            "BOOT", "BOTTLE", "BOW", "BOX", "BRIDGE", "BRUSH", "BUCK", "BUFFALO", "BUG", "BUGLE",
-            "BUTTON", "CALF", "CANADA", "CAP", "CAPITAL", "CAR", "CARD", "CARROT", "CASINO", "CAST",
-            "CAT", "CELL", "CENTAUR", "CENTER", "CHAIR", "CHANGE", "CHARGE", "CHECK", "CHEST", "CHICK",
-            "CHINA", "CHOCOLATE", "CHURCH", "CIRCLE", "CLIFF", "CLOAK", "CLUB", "CODE", "COLD", "COMIC",
-            "COMPOUND", "CONCERT", "CONDUCTOR", "CONTRACT", "COOK", "COPPER", "COTTON", "COURT", "COVER", "CRANE",
-            "CRASH", "CRICKET", "CROSS", "CROWN", "CYCLE", "CZECH", "DANCE", "DATE", "DAY", "DEATH",
-            "DECK", "DEGREE", "DIAMOND", "DICE", "DINOSAUR", "DISEASE", "DOCTOR", "DOG", "DRAFT", "DRAGON",
-            "DRESS", "DRILL", "DROP", "DUCK", "DWARF", "EAGLE", "EGYPT", "EMBASSY", "ENGINE", "ENGLAND",
-            "EUROPE", "EYE", "FACE", "FAIR", "FALL", "FAN", "FENCE", "FIELD", "FIGHTER", "FIGURE",
-            "FILE", "FILM", "FIRE", "FISH", "FLUTE", "FLY", "FOOT", "FORCE", "FOREST", "FORK",
-            "FRANCE", "GAME", "GAS", "GENIUS", "GERMANY", "GHOST", "GIANT", "GLASS", "GLOVE", "GOLD",
-            "GRACE", "GRASS", "GREECE", "GREEN", "GROUND", "HAM", "HAND", "HAWK", "HEAD", "HEART",
-            "HELICOPTER", "HIMALAYAS", "HOLE", "HOLLYWOOD", "HONEY", "HOOD", "HOOK", "HORN", "HORSE", "HORSESHOE",
-            "HOSPITAL", "HOTEL", "ICE", "ICE CREAM", "INDIA", "IRON", "IVORY", "JACK", "JAM", "JET",
-            "JUPITER", "KANGAROO", "KETCHUP", "KEY", "KID", "KING", "KIWI", "KNIFE", "KNIGHT", "LAB",
-            "LAP", "LASER", "LAWYER", "LEAD", "LEMON", "LEPRECHAUN", "LIFE", "LIGHT", "LIMOUSINE", "LINE",
-            "LINK", "LION", "LITTER", "LOCH NESS", "LOCK", "LOG", "LONDON", "LUCK", "MAIL", "MAMMOTH",
-            "MAPLE", "MARBLE", "MARCH", "MASS", "MATCH", "MERCURY", "MEXICO", "MICROSCOPE", "MILLIONAIRE", "MINE",
-            "MINT", "MISSILE", "MODEL", "MOLE", "MOON", "MOSCOW", "MOUNT", "MOUSE", "MOUTH", "MUG",
-            "NAIL", "NEEDLE", "NET", "NEW YORK", "NIGHT", "NINJA", "NOTE", "NOVEL", "NURSE", "NUT",
-            "OCTOPUS", "OIL", "OLIVE", "OLYMPUS", "OPERA", "ORANGE", "ORGAN", "PALM", "PAN", "PANTS",
-            "PAPER", "PARACHUTE", "PARK", "PART", "PASS", "PASTE", "PENGUIN", "PHOENIX", "PIANO", "PIE",
-            "PILOT", "PIN", "PIPE", "PIRATE", "PISTOL", "PIT", "PITCH", "PLANE", "PLASTIC", "PLATE",
-            "PLATYPUS", "PLAY", "PLOT", "POINT", "POISON", "POLE", "POLICE", "POOL", "PORT", "POST",
-            "POUND", "PRESS", "PRINCESS", "PUMPKIN", "PUPIL", "PYRAMID", "QUEEN", "RABBIT", "RACKET", "RAY",
-            "REVOLUTION", "RING", "ROBIN", "ROBOT", "ROCK", "ROME", "ROOT", "ROSE", "ROULETTE", "ROUND",
-            "ROW", "RULER", "SATELLITE", "SATURN", "SCALE", "SCHOOL", "SCIENTIST", "SCORPION", "SCREEN", "SCUBA DIVER",
-            "SEAL", "SERVER", "SHADOW", "SHAKESPEARE", "SHARK", "SHIP", "SHOE", "SHOP", "SHOT", "SINK",
-            "SKYSCRAPER", "SLIP", "SLUG", "SMUGGLER", "SNOW", "SNOWMAN", "SOCK", "SOLDIER", "SOUL", "SOUND",
-            "SPACE", "SPELL", "SPIDER", "SPIKE", "SPINE", "SPOT", "SPRING", "SPY", "SQUARE", "STADIUM",
-            "STAFF", "STAR", "STATE", "STICK", "STOCK", "STRAW", "STREAM", "STRIKE", "STRING", "SUB",
-            "SUIT", "SUPERHERO", "SWING", "SWITCH", "TABLE", "TABLET", "TAG", "TAIL", "TAP", "TEACHER",
-            "TELESCOPE", "TEMPLE", "THEATER", "THIEF", "THUMB", "TICK", "TIE", "TIME", "TOKYO", "TOOTH",
-            "TORCH", "TOWER", "TRACK", "TRAIN", "TRIANGLE", "TRIP", "TRUNK", "TUBE", "TURKEY", "UNDERTAKER",
-            "UNICORN", "VACUUM", "VAN", "VET", "WAKE", "WALL", "WAR", "WASHER", "WASHINGTON", "WATCH",
-            "WATER", "WAVE", "WEB", "WELL", "WHALE", "WHIP", "WIND", "WITCH", "WORM", "YARD"
-        ];
+        // Board (words + roles) is derived locally and deterministically from the room name.
+        // Mutable state (revealed cards, turn, scores, gameActive, generation) syncs through Firebase.
+        // Bumping `generation` forces all clients to reset the board (used by "New Game").
+        let room = '', words = [], roles = [], revealed = Array(25).fill(false);
+        let currentTurn = 'blue', scores = { blue: 0, red: 0 }, gameActive = true, generation = 0;
+        let stateRef = null, applyingRemote = false;
 
-        let words = [], roles = [], revealed = [], currentTurn = 'blue', scores = { blue: 0, red: 0 }, gameActive = true;
-
-        function syncToStorage() {
-            localStorage.setItem('codenames_words', JSON.stringify(words));
-            localStorage.setItem('codenames_roles', JSON.stringify(roles));
-            localStorage.setItem('codenames_revealed', JSON.stringify(revealed));
+        function ensureRoom() {
+            const r = getRoomFromQuery();
+            if (r) return r;
+            const generated = randomRoomName();
+            window.location.replace('codenames.html?room=' + encodeURIComponent(generated));
+            return null;
         }
 
-        function shuffleArray(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
+        function rebuildBoard() {
+            const board = buildBoard(room + '#' + generation);
+            words = board.words;
+            roles = board.roles;
+        }
+
+        function defaultState() {
+            return {
+                revealed: Array(25).fill(false),
+                currentTurn: 'blue',
+                scores: { blue: 0, red: 0 },
+                gameActive: true,
+                generation: 0
+            };
+        }
+
+        function applyRemote(state) {
+            applyingRemote = true;
+            try {
+                const s = state || defaultState();
+                generation = typeof s.generation === 'number' ? s.generation : 0;
+                revealed = Array.isArray(s.revealed) && s.revealed.length === 25 ? s.revealed.slice() : Array(25).fill(false);
+                currentTurn = s.currentTurn === 'red' ? 'red' : 'blue';
+                scores = {
+                    blue: (s.scores && typeof s.scores.blue === 'number') ? s.scores.blue : 0,
+                    red: (s.scores && typeof s.scores.red === 'number') ? s.scores.red : 0
+                };
+                gameActive = s.gameActive !== false;
+                rebuildBoard();
+                updateUI();
+                refreshGameOverOverlay();
+            } finally {
+                applyingRemote = false;
             }
-            return arr;
         }
 
-        function initGame() {
-            const shuffledWords = shuffleArray([...wordBank]);
-            words = shuffledWords.slice(0, 25);
-            const roleList = [...Array(9).fill('blue'), ...Array(8).fill('red'), 'assassin', ...Array(7).fill('neutral')];
-            roles = shuffleArray(roleList);
-            revealed = Array(25).fill(false);
-            currentTurn = 'blue';
-            scores = { blue: 0, red: 0 };
-            gameActive = true;
-            document.getElementById('gameOver').style.display = 'none';
-            syncToStorage();
-            updateUI();
+        function pushState() {
+            if (applyingRemote || !stateRef) return;
+            stateRef.set({ revealed, currentTurn, scores, gameActive, generation });
         }
 
         function updateUI() {
@@ -399,45 +415,103 @@
             if (!gameActive || revealed[index]) return;
             revealed[index] = true;
             const role = roles[index];
-            
+            let endMsg = null, endColor = null;
+
             if (role === currentTurn) {
                 scores[currentTurn]++;
-                if (currentTurn === 'blue' && scores.blue === 9) endGame('Blue Team Wins!', '#1a3a6e');
-                if (currentTurn === 'red' && scores.red === 8) endGame('Red Team Wins!', '#8b0000');
+                if (currentTurn === 'blue' && scores.blue === 9) { endMsg = 'Blue Team Wins!'; endColor = '#1a3a6e'; }
+                if (currentTurn === 'red' && scores.red === 8) { endMsg = 'Red Team Wins!'; endColor = '#8b0000'; }
             } else if (role === 'assassin') {
-                const winner = currentTurn === 'blue' ? { team: 'Red Team', color: '#8b0000' } : { team: 'Blue Team', color: '#1a3a6e' };
-                endGame(`${winner.team} Wins!<br><span style="font-size:24px;margin-top:10px;">Assassin: ${words[index]}</span>`, winner.color);
+                const winner = currentTurn === 'blue'
+                    ? { team: 'Red Team', color: '#8b0000' }
+                    : { team: 'Blue Team', color: '#1a3a6e' };
+                endMsg = `${winner.team} Wins!<br><span style="font-size:24px;margin-top:10px;">Assassin: ${words[index]}</span>`;
+                endColor = winner.color;
             } else {
                 if (role === 'blue' || role === 'red') {
                     scores[role]++;
-                    if (role === 'blue' && scores.blue === 9) endGame('Blue Team Wins!');
-                    if (role === 'red' && scores.red === 8) endGame('Red Team Wins!');
+                    if (role === 'blue' && scores.blue === 9) { endMsg = 'Blue Team Wins!'; endColor = '#1a3a6e'; }
+                    if (role === 'red' && scores.red === 8) { endMsg = 'Red Team Wins!'; endColor = '#8b0000'; }
                 }
-                if (gameActive) {
-                    currentTurn = currentTurn === 'blue' ? 'red' : 'blue';
-                }
+                if (!endMsg) currentTurn = currentTurn === 'blue' ? 'red' : 'blue';
             }
-            syncToStorage();
+
+            if (endMsg) {
+                gameActive = false;
+                showGameOver(endMsg, endColor);
+            }
             updateUI();
+            pushState();
         }
 
-        function endGame(message, winnerColor) {
-            gameActive = false;
+        function showGameOver(message, winnerColor) {
             const el = document.getElementById('gameOver');
             const stampColor = winnerColor || 'rgba(139, 0, 0, 0.6)';
             el.innerHTML = `<div class="stamp" style="color: ${stampColor}; border-color: ${stampColor};">${message}</div>`;
             el.style.display = 'flex';
         }
 
+        function refreshGameOverOverlay() {
+            // After a remote sync we don't know the original end-of-game text; if the game is
+            // still active hide the overlay. If it ended, recompute a reasonable banner.
+            const el = document.getElementById('gameOver');
+            if (gameActive) {
+                el.style.display = 'none';
+                return;
+            }
+            if (scores.blue === 9) return showGameOver('Blue Team Wins!', '#1a3a6e');
+            if (scores.red === 8) return showGameOver('Red Team Wins!', '#8b0000');
+            // Otherwise it must be an assassin — try to find the revealed assassin word.
+            const idx = roles.findIndex((r, i) => r === 'assassin' && revealed[i]);
+            if (idx >= 0) {
+                const winnerSide = currentTurn === 'blue' ? 'Blue' : 'Red';
+                showGameOver(`${winnerSide} Team Wins!<br><span style="font-size:24px;margin-top:10px;">Assassin: ${words[idx]}</span>`,
+                    currentTurn === 'blue' ? '#1a3a6e' : '#8b0000');
+            } else {
+                el.style.display = 'none';
+            }
+        }
+
         function endTurn() {
             if (!gameActive) return;
             currentTurn = currentTurn === 'blue' ? 'red' : 'blue';
             updateUI();
+            pushState();
+        }
+
+        function newGame() {
+            generation = (generation || 0) + 1;
+            revealed = Array(25).fill(false);
+            currentTurn = 'blue';
+            scores = { blue: 0, red: 0 };
+            gameActive = true;
+            rebuildBoard();
+            document.getElementById('gameOver').style.display = 'none';
+            updateUI();
+            pushState();
         }
 
         window.addEventListener('DOMContentLoaded', function() {
+            room = ensureRoom();
+            if (!room) return;
+            document.getElementById('roomName').textContent = room;
+            document.getElementById('masterLink').href = 'codemasters.html?room=' + encodeURIComponent(room);
             document.getElementById('endTurnBtn').addEventListener('click', endTurn);
-            initGame();
+            document.getElementById('newGameBtn').addEventListener('click', newGame);
+
+            rebuildBoard();
+            updateUI();
+
+            stateRef = roomRef(room).child('state');
+            stateRef.on('value', function(snap) {
+                const val = snap.val();
+                if (val === null) {
+                    // First visitor seeds the room.
+                    stateRef.set(defaultState());
+                } else {
+                    applyRemote(val);
+                }
+            });
         });
     </script>
 </body>
