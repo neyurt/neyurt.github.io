@@ -7,14 +7,17 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap');
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        html { -webkit-text-size-adjust: 100%; }
 
         body {
-            padding: 20px;
+            padding: clamp(12px, 3vw, 20px);
             background: #f5f0e8 url('paper-texture.png') repeat;
             background-size: 400px 400px;
             font-family: 'Courier Prime', 'Courier New', monospace;
             min-height: 100vh;
+            min-height: 100dvh;
             position: relative;
             display: flex;
             align-items: center;
@@ -27,12 +30,12 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 120px;
+            font-size: clamp(50px, 12vw, 120px);
             color: rgba(139, 0, 0, 0.06);
             font-family: 'Special Elite', 'Courier New', monospace;
             pointer-events: none;
             z-index: 0;
-            letter-spacing: 20px;
+            letter-spacing: clamp(8px, 2vw, 20px);
             white-space: nowrap;
         }
 
@@ -45,19 +48,19 @@
 
         .header {
             text-align: center;
-            padding: 40px 30px;
+            padding: clamp(28px, 5vw, 40px) clamp(20px, 4vw, 30px);
             background: #ebe5d9;
             border: 3px solid #a09372;
             position: relative;
-            margin-bottom: 30px;
+            margin-bottom: clamp(20px, 3vw, 30px);
         }
 
         .header::before {
             content: 'CLASSIFIED';
             position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 13px;
+            top: 12px;
+            right: 15px;
+            font-size: clamp(10px, 1.5vw, 13px);
             color: rgba(139, 0, 0, 0.5);
             font-family: 'Special Elite', 'Courier New', monospace;
             letter-spacing: 3px;
@@ -71,8 +74,8 @@
         .header::after {
             content: '▲ TOP SECRET ▲';
             position: absolute;
-            bottom: 10px;
-            left: 20px;
+            bottom: 8px;
+            left: 15px;
             font-size: 9px;
             color: rgba(139, 0, 0, 0.35);
             font-family: 'Special Elite', 'Courier New', monospace;
@@ -82,15 +85,16 @@
 
         h1 {
             font-family: 'Special Elite', 'Courier New', monospace;
-            font-size: 48px;
+            font-size: clamp(28px, 7vw, 48px);
             color: #2c2c2c;
-            letter-spacing: 10px;
+            letter-spacing: clamp(4px, 1.5vw, 10px);
             margin-bottom: 10px;
             text-transform: uppercase;
+            line-height: 1.1;
         }
 
         .subtitle {
-            font-size: 14px;
+            font-size: clamp(11px, 1.6vw, 14px);
             color: #6b655a;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -99,23 +103,24 @@
         .menu {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: clamp(12px, 2vw, 15px);
         }
 
         .menu-item {
             display: block;
-            padding: 20px 30px;
+            padding: clamp(16px, 2.5vw, 20px) clamp(20px, 3vw, 30px);
             background: #ebe5d9;
             border: 3px solid #a09372;
             text-decoration: none;
             color: #2c2c2c;
             font-family: 'Special Elite', 'Courier New', monospace;
-            font-size: 20px;
-            letter-spacing: 4px;
+            font-size: clamp(16px, 2.5vw, 20px);
+            letter-spacing: clamp(2px, 0.5vw, 4px);
             text-align: center;
             text-transform: uppercase;
             transition: all 0.2s;
             position: relative;
+            touch-action: manipulation;
         }
 
         .menu-item:hover {
@@ -127,7 +132,7 @@
         .menu-item .desc {
             display: block;
             font-family: 'Courier Prime', 'Courier New', monospace;
-            font-size: 12px;
+            font-size: clamp(10px, 1.4vw, 12px);
             letter-spacing: 1px;
             margin-top: 5px;
             color: #6b655a;
@@ -140,9 +145,9 @@
 
         .footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: clamp(20px, 3vw, 30px);
             padding: 15px;
-            font-size: 11px;
+            font-size: clamp(10px, 1.3vw, 11px);
             color: #8c8578;
             letter-spacing: 1px;
             border-top: 2px solid #a09372;
@@ -152,8 +157,8 @@
             position: fixed;
             top: 20px;
             left: 30px;
-            width: 120px;
-            height: 120px;
+            width: clamp(70px, 12vw, 120px);
+            height: clamp(70px, 12vw, 120px);
             background: url('top-secret-stamp.webp') no-repeat center;
             background-size: contain;
             opacity: 0.12;
@@ -165,8 +170,8 @@
             position: fixed;
             bottom: 20px;
             right: 30px;
-            width: 100px;
-            height: 100px;
+            width: clamp(60px, 10vw, 100px);
+            height: clamp(60px, 10vw, 100px);
             background: url('top-secret-stamp.webp') no-repeat center;
             background-size: contain;
             opacity: 0.1;
@@ -174,22 +179,8 @@
             pointer-events: none;
         }
 
-        @media (max-width: 768px) {
-            h1 { font-size: 36px; letter-spacing: 6px; }
-            .header { padding: 30px 20px; }
-            .menu-item { font-size: 18px; padding: 18px 25px; }
-            .stamp-graphic, .stamp-graphic-2 { width: 80px; height: 80px; opacity: 0.08; }
-            body::before { font-size: 80px; letter-spacing: 15px; }
-        }
-
         @media (max-width: 480px) {
-            h1 { font-size: 28px; letter-spacing: 4px; }
-            .subtitle { font-size: 12px; }
-            .menu-item { font-size: 16px; padding: 15px 20px; }
-            .menu-item .desc { font-size: 11px; }
             .stamp-graphic, .stamp-graphic-2 { display: none; }
-            body::before { font-size: 50px; letter-spacing: 10px; }
-            .footer { font-size: 10px; }
         }
     </style>
 </head>
