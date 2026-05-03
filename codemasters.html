@@ -7,14 +7,17 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap');
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        html { -webkit-text-size-adjust: 100%; }
 
         body {
-            padding: 20px;
+            padding: clamp(8px, 2vw, 20px);
             background: #f5f0e8 url('paper-texture.png') repeat;
             background-size: 400px 400px;
             font-family: 'Courier Prime', 'Courier New', monospace;
             min-height: 100vh;
+            min-height: 100dvh;
             position: relative;
         }
 
@@ -24,12 +27,12 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 100px;
+            font-size: clamp(50px, 12vw, 100px);
             color: rgba(139, 0, 0, 0.06);
             font-family: 'Special Elite', 'Courier New', monospace;
             pointer-events: none;
             z-index: 0;
-            letter-spacing: 20px;
+            letter-spacing: clamp(8px, 2.5vw, 20px);
             white-space: nowrap;
         }
 
@@ -39,11 +42,11 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-5deg);
-            font-size: 40px;
+            font-size: clamp(20px, 5vw, 40px);
             color: rgba(139, 0, 0, 0.15);
             font-family: 'Special Elite', 'Courier New', monospace;
             pointer-events: none;
-            letter-spacing: 5px;
+            letter-spacing: clamp(3px, 1vw, 5px);
         }
 
         .container {
@@ -56,11 +59,11 @@
         h1 {
             font-family: 'Special Elite', 'Courier New', monospace;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: clamp(15px, 3vw, 25px);
             color: #2c2c2c;
-            letter-spacing: 6px;
-            font-size: 36px;
-            padding: 20px;
+            letter-spacing: clamp(3px, 1.2vw, 6px);
+            font-size: clamp(22px, 5.5vw, 36px);
+            padding: clamp(12px, 2.5vw, 20px);
             background: #ebe5d9;
             border: 2px solid #c4b89c;
             position: relative;
@@ -70,7 +73,7 @@
             content: 'TOP SECRET';
             position: absolute;
             bottom: 5px;
-            right: 15px;
+            right: 10px;
             font-size: 9px;
             color: #8b0000;
             letter-spacing: 3px;
@@ -79,8 +82,8 @@
         .grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            padding: 20px;
+            gap: clamp(3px, 1vw, 10px);
+            padding: clamp(6px, 1.5vw, 20px);
             background: #e8e2d4;
             border: 3px solid #a09372;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
@@ -91,45 +94,33 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: clamp(2px, 0.6vw, 10px);
             text-align: center;
-            font-size: 13px;
+            font-size: clamp(8px, 1.6vw, 13px);
             font-weight: bold;
             font-family: 'Courier Prime', 'Courier New', monospace;
             border: 2px solid #a09372;
             color: white;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            line-height: 1.1;
+            min-width: 0;
         }
 
-        .card.blue {
-            background: #1a3a6e;
-            border-color: #0d1f3c;
-        }
-
-        .card.red {
-            background: #8b0000;
-            border-color: #5c0000;
-        }
-
-        .card.assassin {
-            background: #1a1a1a;
-            border-color: #000;
-        }
-
-        .card.neutral {
-            background: #8c8578;
-            border-color: #6b655a;
-            color: #e8e2d4;
-        }
+        .card.blue { background: #1a3a6e; border-color: #0d1f3c; }
+        .card.red { background: #8b0000; border-color: #5c0000; }
+        .card.assassin { background: #1a1a1a; border-color: #000; }
+        .card.neutral { background: #8c8578; border-color: #6b655a; color: #e8e2d4; }
 
         .legend {
-            margin-top: 25px;
+            margin-top: clamp(15px, 3vw, 25px);
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: clamp(8px, 2vw, 15px);
             justify-content: center;
-            padding: 15px;
+            padding: clamp(10px, 2vw, 15px);
             background: #ebe5d9;
             border: 2px solid #c4b89c;
         }
@@ -138,7 +129,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 12px;
+            font-size: clamp(10px, 1.6vw, 12px);
             font-weight: bold;
             color: #2c2c2c;
             letter-spacing: 1px;
@@ -149,6 +140,7 @@
             width: 18px;
             height: 18px;
             border: 2px solid #a09372;
+            flex-shrink: 0;
         }
 
         .legend-box.blue { background: #1a3a6e; }
