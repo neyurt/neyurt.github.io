@@ -276,6 +276,61 @@
             text-align: center;
             line-height: 1.3;
         }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+                padding: 15px;
+            }
+            h1 { font-size: 32px; letter-spacing: 5px; }
+            .turn-indicator { font-size: 18px; }
+            .scores { gap: 30px; font-size: 14px; }
+            .card { font-size: 12px; padding: 6px; }
+            .stamp-graphic { width: 80px; height: 80px; top: 5px; left: 15px; }
+            .game-over { font-size: 24px; }
+            .game-over::before { font-size: 80px; letter-spacing: 20px; }
+            .game-over .stamp { font-size: 40px; padding: 15px 30px; }
+            body::before { font-size: 80px; }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 5px;
+                padding: 10px;
+            }
+            h1 { font-size: 24px; letter-spacing: 3px; }
+            .turn-indicator { font-size: 16px; }
+            .scores {
+                flex-direction: column;
+                gap: 5px;
+                align-items: center;
+            }
+            .card {
+                font-size: 11px;
+                padding: 4px;
+                aspect-ratio: 3/2;
+            }
+            #endTurnBtn {
+                width: 100%;
+                padding: 12px;
+                font-size: 14px;
+            }
+            .master-link a {
+                font-size: 16px;
+                padding: 10px 20px;
+                letter-spacing: 2px;
+            }
+            .game-over { font-size: 20px; }
+            .game-over::before { font-size: 50px; letter-spacing: 10px; }
+            .game-over .stamp { font-size: 32px; padding: 10px 20px; }
+            body::before { font-size: 60px; letter-spacing: 10px; }
+            .header { padding: 15px; }
+            .header::before { font-size: 11px; right: 15px; top: 10px; }
+            .header::after { font-size: 8px; left: 10px; }
+        }
     </style>
 </head>
 <body>

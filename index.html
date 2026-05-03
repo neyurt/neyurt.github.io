@@ -173,6 +173,24 @@
             transform: rotate(10deg);
             pointer-events: none;
         }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 36px; letter-spacing: 6px; }
+            .header { padding: 30px 20px; }
+            .menu-item { font-size: 18px; padding: 18px 25px; }
+            .stamp-graphic, .stamp-graphic-2 { width: 80px; height: 80px; opacity: 0.08; }
+            body::before { font-size: 80px; letter-spacing: 15px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 28px; letter-spacing: 4px; }
+            .subtitle { font-size: 12px; }
+            .menu-item { font-size: 16px; padding: 15px 20px; }
+            .menu-item .desc { font-size: 11px; }
+            .stamp-graphic, .stamp-graphic-2 { display: none; }
+            body::before { font-size: 50px; letter-spacing: 10px; }
+            .footer { font-size: 10px; }
+        }
     </style>
 </head>
 <body>
